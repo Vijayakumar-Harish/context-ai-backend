@@ -1,31 +1,44 @@
 import { FastifyInstance } from "fastify";
-import { createTask, getLastWorkingContext, getNextTasks, getSmartNextTask, listTasks } from "./task.service";
+import {
+  createTask,
+  getLastWorkingContext,
+  getNextTasks,
+  getSmartNextTask,
+  listTasks,
+} from "./task.service";
 import { createTaskSchema } from "./task.schema";
+import { authGuard } from "../../plugins/auth";
 
 export async function taskRoutes(app: FastifyInstance) {
-  app.post("/tasks", async (req) => {
-    const data = createTaskSchema.parse(req.body);
-    return createTask(data);
+app.post("/tasks", { preHandler: authGuard }, async (req) => {
+  const data = createTaskSchema.parse(req.body);
+
+  const userId = (req as any).user.userId; // "u1"
+
+  return createTask({
+    ...data,
+    userId,
+  });
+});
+
+
+
+  app.get("/tasks", { preHandler: authGuard }, async (req) => {
+    return listTasks((req as any).user.userId);
   });
 
-  app.get("/tasks/:userId", async (req) => {
-    const { userId } = req.params as { userId: string };
-    return listTasks(userId);
+  app.get("/tasks/next", { preHandler: authGuard }, async (req) => {
+    return getNextTasks((req as any).user.userId);
   });
 
-  app.get("/tasks/next/:userId", async (req) => {
-    const { userId } = req.params as { userId: string };
-    return getNextTasks(userId);
+  app.get("/tasks/next-ai", { preHandler: authGuard }, async (req) => {
+    return getSmartNextTask((req as any).user.userId);
   });
 
-  app.get("/tasks/next-ai/:userId", async (req) => {
-    const { userId } = req.params as { userId: string };
-    return getSmartNextTask(userId);
-  });
+app.get("/tasks/restore", { preHandler: authGuard }, async (req) => {
+  const userId = (req as any).user.userId;
+  return getLastWorkingContext(userId);
+});
 
-  app.get("/tasks/restore/:userId", async (req) => {
-    const { userId } = req.params as { userId: string };
-    return getLastWorkingContext(userId);
-  });
-
+  
 }

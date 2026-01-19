@@ -39,8 +39,6 @@ export const getNextTasks = async (userId: string) => {
   });
 };
 
-
-
 export const getSmartNextTask = async (userId: string) => {
   const tasks = await prisma.task.findMany({
     where: {
@@ -87,7 +85,12 @@ export const getLastWorkingContext = async (userId: string) => {
     },
   });
 
-  if (!task) return null;
+  if (!task) {
+    return {
+      type: "EMPTY",
+      message: "No previous task found. Start by creating a task.",
+    };
+  }
 
   return {
     taskId: task.id,
@@ -97,4 +100,3 @@ export const getLastWorkingContext = async (userId: string) => {
     lastUpdated: task.updatedAt,
   };
 };
-
