@@ -1,6 +1,7 @@
 import { FastifyInstance } from "fastify";
 import {
   createContext,
+  getDailySummary,
   getTaskContext,
   getUserContext,
 } from "./context.service";
@@ -21,4 +22,13 @@ export async function contextRoutes(app: FastifyInstance) {
     const { userId } = req.params as { userId: string };
     return getUserContext(userId);
   });
+
+  app.get("/context/daily-summary/:userId", async (req) => {
+    const { userId } = req.params as { userId: string };
+    return {
+      date: new Date().toISOString().split("T")[0],
+      summary: await getDailySummary(userId, new Date()),
+    };
+  });
+
 }
