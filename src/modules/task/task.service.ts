@@ -70,3 +70,30 @@ export const getSmartNextTask = async (userId: string) => {
   return getNextTaskFromAI(prompt);
 };
 
+export const getLastWorkingContext = async (userId: string) => {
+  const task = await prisma.task.findFirst({
+    where: {
+      userId,
+      status: { not: "DONE" },
+    },
+    include: {
+      contexts: {
+        orderBy: { createdAt: "desc" },
+        take: 1,
+      },
+    },
+    orderBy: {
+      updatedAt: "desc",
+    },
+  });
+
+  if (!task) return null;
+
+  return {
+    taskId: task.id,
+    title: task.title,
+    status: task.status,
+    lastContext: task.contexts[0]?.content ?? null,
+    lastUpdated: task.updatedAt,
+  };
+};

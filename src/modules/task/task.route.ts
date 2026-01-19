@@ -1,5 +1,5 @@
 import { FastifyInstance } from "fastify";
-import { createTask, getNextTasks, getSmartNextTask, listTasks } from "./task.service";
+import { createTask, getLastWorkingContext, getNextTasks, getSmartNextTask, listTasks } from "./task.service";
 import { createTaskSchema } from "./task.schema";
 
 export async function taskRoutes(app: FastifyInstance) {
@@ -21,6 +21,11 @@ export async function taskRoutes(app: FastifyInstance) {
   app.get("/tasks/next-ai/:userId", async (req) => {
     const { userId } = req.params as { userId: string };
     return getSmartNextTask(userId);
+  });
+
+  app.get("/tasks/restore/:userId", async (req) => {
+    const { userId } = req.params as { userId: string };
+    return getLastWorkingContext(userId);
   });
 
 }
