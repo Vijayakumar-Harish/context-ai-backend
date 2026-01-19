@@ -1,5 +1,5 @@
 import { FastifyInstance } from "fastify";
-import { createTask, listTasks } from "./task.service";
+import { createTask, getNextTasks, listTasks } from "./task.service";
 import { createTaskSchema } from "./task.schema";
 
 export async function taskRoutes(app: FastifyInstance) {
@@ -12,4 +12,10 @@ export async function taskRoutes(app: FastifyInstance) {
     const { userId } = req.params as { userId: string };
     return listTasks(userId);
   });
+
+  app.get("/tasks/next/:userId", async (req) => {
+    const { userId } = req.params as { userId: string };
+    return getNextTasks(userId);
+  });
+
 }
