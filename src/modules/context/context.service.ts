@@ -1,4 +1,6 @@
 import { prisma } from "../../plugins/prisma";
+import { dailySummaryPrompt } from "../ai/summary.prompt";
+import { generateDailySummaryAI } from "../ai/summary.service";
 
 export const createContext = async (data: {
   content: string;
@@ -64,3 +66,20 @@ export const getDailySummary = async (userId: string, date: Date) => {
     progress: notes.join(" | "),
   }));
 };
+
+
+
+export const getDailySummaryWithAI = async (userId: string) => {
+  const date = new Date().toISOString().split("T")[0];
+  const baseSummary = await getDailySummary(userId, new Date());
+
+  if (!baseSummary.length) return null;
+
+  const prompt = dailySummaryPrompt({
+    date,
+    summaries: baseSummary,
+  });
+
+  return generateDailySummaryAI(prompt);
+};
+
