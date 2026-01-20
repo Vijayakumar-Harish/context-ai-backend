@@ -1,3 +1,4 @@
+import type {} from "./@types/fastify";
 import Fastify from "fastify";
 import cors from "@fastify/cors";
 import { taskRoutes } from "./modules/task/task.route";
